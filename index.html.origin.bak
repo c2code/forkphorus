@@ -208,6 +208,7 @@
 
     /** Constants **/
     var PROJECT_PREFIX = 'https://scratch.mit.edu/projects/';
+    //var PROJECT_PREFIX = 'https://adapter.codelab.club/sb3/';
     var STUDIO = '15926401';
 
     /** Core Player Logic **/

@@ -632,7 +632,25 @@ namespace P.player {
     /**
      * Load a remote project from its ID
      */
-    loadProjectId(id: string, options: StageLoadOptions) {
+    loadProjectId(uid: string, cid: string, options: StageLoadOptions) {
+      //test for get sb3 file only
+      var id = "";
+      var hostip = ""
+      var match = document.location.origin.match(/:\/\/(www[0-9]?\.)?(.[^/:]+)/i);
+      if (match != null && match.length > 2 && typeof match[2] === 'string' && match[2].length > 0) {
+        hostip = match[2];
+      }
+      console.info("host ip is " + hostip);
+      var request = new P.IO.BlobRequest("http://"+hostip+":8088/api/myhomework/download?uid="+uid+"&cid="+cid, { rejectOnError: false });
+      var tmp = request.load().then(function(response) {
+        if (request.xhr.status === 404) {
+          throw new ProjectDoesNotExistError(uid);
+        }
+        return P.IO.readers.toArrayBuffer(response)
+      });
+      return this.loadProjectBuffer(tmp,"sb3", options)
+      //test end
+
       this.startLoadingNewProject();
       const stageId = this.getNewStageId();
       this.projectId = '' + id;
