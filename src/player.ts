@@ -632,7 +632,7 @@ namespace P.player {
     /**
      * Load a remote project from its ID
      */
-    async loadProjectId(uid: string, cid: string, options: StageLoadOptions) {
+    loadProjectId(uid: string, cid: string, options: StageLoadOptions) {
       //test for get sb3 file only
       var id = "";
       var hostip = ""
@@ -649,7 +649,7 @@ namespace P.player {
         }
         return P.IO.readers.toArrayBuffer(response)
       });
-      return this.loadProjectBuffer(await tmp, "sb3", options)
+      return this.loadProjectBuffer(tmp, "sb3", options)
       //test end
 
       this.startLoadingNewProject();
