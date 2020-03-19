@@ -632,7 +632,7 @@ namespace P.player {
     /**
      * Load a remote project from its ID
      */
-    loadProjectId(uid: string, cid: string, options: StageLoadOptions) {
+    async loadProjectId(uid: string, cid: string, options: StageLoadOptions) {
       //test for get sb3 file only
       var id = "";
       var hostip = ""
@@ -641,14 +641,15 @@ namespace P.player {
         hostip = match[2];
       }
       console.info("host ip is " + hostip);
-      var request = new P.IO.BlobRequest("http://"+hostip+":8088/api/myhomework/download?uid="+uid+"&cid="+cid, { rejectOnError: false });
-      var tmp = request.load().then(function(response) {
+      //var request = new P.IO.BlobRequest("http://" + hostip + ":8080/api/myhomework/download?uid=" + uid + "&cid=" + cid, {rejectOnError: false});
+      var request = new P.IO.BlobRequest("https://adapter.codelab.club/sb3/Pong_Starter.sb3", {rejectOnError: false});
+      var tmp = request.load().then(function (response) {
         if (request.xhr.status === 404) {
           throw new ProjectDoesNotExistError(uid);
         }
         return P.IO.readers.toArrayBuffer(response)
       });
-      return this.loadProjectBuffer(tmp,"sb3", options)
+      return this.loadProjectBuffer(await tmp, "sb3", options)
       //test end
 
       this.startLoadingNewProject();
@@ -657,45 +658,45 @@ namespace P.player {
       this.projectLink = Player.PROJECT_LINK.replace('$id', id);
       let blob: Blob;
       return this._fetchProject(id)
-        .then((data) => {
-          blob = data;
-          return P.IO.readers.toText(blob);
-        })
-        .then((text) => {
-          if (!this.isStageActive(stageId)) {
-            return null;
-          }
-          try {
-            var json = JSON.parse(text);
-            var type = Player.getProjectType(json);
-            if (type === 3) {
-              return this._loadScratch3(stageId, json);
-            } else if (type === 2) {
-              return this._loadScratch2(stageId, json);
-            } else {
-              throw new Error('Project is valid JSON but of unknown type');
+          .then((data) => {
+            blob = data;
+            return P.IO.readers.toText(blob);
+          })
+          .then((text) => {
+            if (!this.isStageActive(stageId)) {
+              return null;
             }
-          } catch (e) {
-            // not json, but could be a zipped sb2
-            return P.IO.readers.toArrayBuffer(blob).then((buffer) => {
-              if (this.isScratch1Project(buffer)) {
-                throw new ProjectNotSupportedError('.sb / Scratch 1');
+            try {
+              var json = JSON.parse(text);
+              var type = Player.getProjectType(json);
+              if (type === 3) {
+                return this._loadScratch3(stageId, json);
+              } else if (type === 2) {
+                return this._loadScratch2(stageId, json);
+              } else {
+                throw new Error('Project is valid JSON but of unknown type');
               }
-              return P.sb2.loadSB2Project(buffer);
-            });
-          }
-        })
-        .then((stage) => {
-          if (stage) {
-            this.installStage(stage, options);
-            this.addCloudVariables(stage, id);
-          }
-        })
-        .catch((error) => {
-          if (this.isStageActive(stageId)) {
-            this.handleError(error);
-          }
-        });
+            } catch (e) {
+              // not json, but could be a zipped sb2
+              return P.IO.readers.toArrayBuffer(blob).then((buffer) => {
+                if (this.isScratch1Project(buffer)) {
+                  throw new ProjectNotSupportedError('.sb / Scratch 1');
+                }
+                return P.sb2.loadSB2Project(buffer);
+              });
+            }
+          })
+          .then((stage) => {
+            if (stage) {
+              this.installStage(stage, options);
+              this.addCloudVariables(stage, id);
+            }
+          })
+          .catch((error) => {
+            if (this.isStageActive(stageId)) {
+              this.handleError(error);
+            }
+          });
     }
 
     /**
