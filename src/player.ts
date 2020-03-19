@@ -632,7 +632,7 @@ namespace P.player {
     /**
      * Load a remote project from its ID
      */
-    loadProjectId(uid: string, cid: string, options: StageLoadOptions) {
+    async loadProjectId(uid: string, cid: string, options: StageLoadOptions) {
       //test for get sb3 file only
       var id = "";
       var hostip = ""
@@ -641,15 +641,15 @@ namespace P.player {
         hostip = match[2];
       }
       console.info("host ip is " + hostip);
-      //var request = new P.IO.BlobRequest("http://" + hostip + ":8080/api/myhomework/download?uid=" + uid + "&cid=" + cid, {rejectOnError: false});
-      var request = new P.IO.BlobRequest("https://adapter.codelab.club/sb3/Pong_Starter.sb3", {rejectOnError: false});
+      var request = new P.IO.BlobRequest("http://" + hostip + ":8080/api/myhomework/download?uid=" + uid + "&cid=" + cid, {rejectOnError: false});
+      //var request = new P.IO.BlobRequest("https://adapter.codelab.club/sb3/Pong_Starter.sb3", {rejectOnError: false});
       var tmp = request.load().then(function (response) {
         if (request.xhr.status === 404) {
           throw new ProjectDoesNotExistError(uid);
         }
         return P.IO.readers.toArrayBuffer(response)
       });
-      return this.loadProjectBuffer(tmp, "sb3", options)
+      return this.loadProjectBuffer(await tmp, "sb3", options)
       //test end
 
       this.startLoadingNewProject();
