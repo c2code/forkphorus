@@ -641,7 +641,7 @@ namespace P.player {
         hostip = match[2];
       }
       console.info("host ip is " + hostip);
-      var request = new P.IO.BlobRequest("http://" + hostip + ":8080/api/myhomework/download?uid=" + uid + "&cid=" + cid, {rejectOnError: false});
+      var request = new P.IO.BlobRequest("http://" + hostip + ":8088/api/myhomework/download?uid=" + uid + "&cid=" + cid, {rejectOnError: false});
       //var request = new P.IO.BlobRequest("https://adapter.codelab.club/sb3/Pong_Starter.sb3", {rejectOnError: false});
       var tmp = request.load().then(function (response) {
         if (request.xhr.status === 404) {
